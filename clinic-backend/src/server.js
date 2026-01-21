@@ -44,18 +44,22 @@ app.use((err, _req, res, _next) => {
 
 const PORT = process.env.PORT || 5001;
 
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  const server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 
-// Handle common startup errors (e.g. port already in use)
-server.on("error", (err) => {
-  if (err && err.code === "EADDRINUSE") {
-    console.error(
-      `Port ${PORT} is already in use. Set PORT in .env (e.g. PORT=5001) or stop the process using that port.`
-    );
+  // Handle common startup errors (e.g. port already in use)
+  server.on("error", (err) => {
+    if (err && err.code === "EADDRINUSE") {
+      console.error(
+        `Port ${PORT} is already in use. Set PORT in .env (e.g. PORT=5001) or stop the process using that port.`
+      );
+      process.exit(1);
+    }
+    console.error(err);
     process.exit(1);
-  }
-  console.error(err);
-  process.exit(1);
-});
+  });
+}
+
+module.exports = app;
